@@ -1,5 +1,16 @@
+/** @typedef {import('./wallet-account.js').IWalletAccount} IWalletAccount */
+/** @typedef {import('./isigner.js').ISigner} ISigner */
+/**
+ * @typedef {Object} WalletConfig
+ * @property {number | bigint} [transferMaxFee] - The maximum fee amount for transfer operations.
+ */
+/**
+ * @typedef {Object} FeeRates
+ * @property {bigint} normal - The fee rate for transaction sent with normal priority.
+ * @property {bigint} fast - The fee rate for transaction sent with fast priority.
+ */
 /** @abstract */
-export default abstract class WalletManager {
+export default class WalletManager {
     /**
      * Returns a random [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) seed phrase.
      *
@@ -26,14 +37,16 @@ export default abstract class WalletManager {
      */
     constructor(seedOrSigner: string | Uint8Array | ISigner, config?: WalletConfig);
     /** @private */
-    private _seed: Uint8Array | null;
+    private _seed;
     /**
      * A map between signer names and signers.
      *
      * @protected
      * @type {{ [name: string]: ISigner }}
      */
-    protected _signers: { [name: string]: ISigner };
+    protected _signers: {
+        [name: string]: ISigner;
+    };
     /**
      * A map between derivation paths and wallet accounts. The {@link dispose} method will automatically dispose
      * all the accounts in this map, so developers are encouraged to map all accounts accessed through the
@@ -42,7 +55,9 @@ export default abstract class WalletManager {
      * @protected
      * @type {{ [path: string]: IWalletAccount }}
      */
-    protected _accounts: { [path: string]: IWalletAccount };
+    protected _accounts: {
+        [path: string]: IWalletAccount;
+    };
     /**
      * The wallet configuration.
      *
@@ -63,7 +78,7 @@ export default abstract class WalletManager {
      * @param {string} signerName - The signer name.
      * @param {ISigner} signer - The signer.
      */
-    abstract createSigner(signerName: string, signer: ISigner): void;
+    createSigner(signerName: string, signer: ISigner): void;
     /**
      * Returns a signer.
      *
@@ -79,7 +94,7 @@ export default abstract class WalletManager {
      * @param {string} [signerName='default'] - The name of the signer to use.
      * @returns {Promise<IWalletAccount>} The account.
      */
-    abstract getAccount(index?: number, signerName?: string): Promise<IWalletAccount>;
+    getAccount(index?: number, signerName?: string): Promise<IWalletAccount>;
     /**
      * Returns the wallet account at a specific [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) derivation path.
      *
@@ -88,14 +103,14 @@ export default abstract class WalletManager {
      * @param {string} [signerName='default'] - The name of the signer to use.
      * @returns {Promise<IWalletAccount>} The account.
      */
-    abstract getAccountByPath(path: string, signerName?: string): Promise<IWalletAccount>;
+    getAccountByPath(path: string, signerName?: string): Promise<IWalletAccount>;
     /**
      * Returns the current fee rates.
      *
      * @abstract
      * @returns {Promise<FeeRates>} The fee rates (in base unit).
      */
-    abstract getFeeRates(): Promise<FeeRates>;
+    getFeeRates(): Promise<FeeRates>;
     /**
      * Disposes all the wallet accounts, erasing their private keys from the memory.
      */
