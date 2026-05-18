@@ -4,15 +4,16 @@ import { describe, expect, jest, test } from '@jest/globals'
 
 import WalletManager from '../index.js'
 
-/**
- * @param {string} [name]
- * @returns {{ name: string, dispose: ReturnType<typeof jest.fn> }}
- */
-function createDummySigner (name = 'dummy') {
-  return {
-    name,
-    dispose: jest.fn()
+class DummySigner {
+  async derive (relPath, options) {
+    return this
   }
+
+  async getAddress () {
+    return 'dummy-address'
+  }
+
+  dispose () {}
 }
 
 class DummyWalletManager extends WalletManager {
@@ -29,10 +30,6 @@ class DummyWalletManager extends WalletManager {
       normal: 0n,
       fast: 0n
     }
-  }
-
-  dispose () {
-    super.dispose()
   }
 }
 
@@ -63,7 +60,7 @@ describe('WalletManager', () => {
     })
 
     test('should set the provided signer as the default signer', () => {
-      const signer = createDummySigner('dummy-signer')
+      const signer = new DummySigner()
       const wallet = new DummyWalletManager(signer)
 
       expect(wallet.getSigner()).toBe(signer)
@@ -125,9 +122,28 @@ describe('WalletManager', () => {
     })
   })
 
+  describe('addSigner', () => {
+    test('should register a signer that can be retrieved by name', () => {
+      const signer = new DummySigner()
+      const wallet = new DummyWalletManager(SEED_PHRASE)
+
+      wallet.addSigner('ledger', signer)
+
+      expect(wallet.getSigner('ledger')).toBe(signer)
+    })
+
+    test('should throw when the signer name is empty', () => {
+      const signer = new DummySigner()
+      const wallet = new DummyWalletManager(SEED_PHRASE)
+
+      expect(() => wallet.addSigner('', signer))
+        .toThrow('Signer name is required.')
+    })
+  })
+
   describe('getSigner', () => {
     test('should throw when requesting an unknown signer name', () => {
-      const signer = createDummySigner('only-default')
+      const signer = new DummySigner()
       const wallet = new DummyWalletManager(signer)
 
       expect(() => wallet.getSigner('ledger'))
@@ -137,14 +153,15 @@ describe('WalletManager', () => {
 
   describe('dispose', () => {
     test('should delegate to WalletManager.dispose and clear signer maps', () => {
-      const signer = createDummySigner('default-signer')
+      const signer = new DummySigner()
+      const disposeSpy = jest.spyOn(signer, 'dispose')
       const wallet = new DummyWalletManager(signer)
 
       expect(wallet.getSigner()).toBe(signer)
 
       wallet.dispose()
 
-      expect(signer.dispose).toHaveBeenCalledTimes(1)
+      expect(disposeSpy).toHaveBeenCalledTimes(1)
       expect(() => wallet.getSigner())
         .toThrow('No default signer registered.')
     })

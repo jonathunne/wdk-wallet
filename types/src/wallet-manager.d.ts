@@ -26,18 +26,19 @@ export default abstract class WalletManager {
    */
   static isValidSeedPhrase(seedPhrase: string): boolean;
   /**
-   * Creates a new wallet manager.
+   * Creates a new wallet manager from a BIP-39 seed.
    *
-   * Accepts either a BIP-39 seed (string mnemonic or raw Uint8Array), or an
-   * {@link ISigner} instance.
-   *
-   * @param {string | Uint8Array | ISigner} seedOrSigner - A BIP-39 seed phrase, raw seed bytes, or a default signer.
+   * @param {string | Uint8Array} seed - The BIP-39 seed phrase or raw seed bytes.
    * @param {WalletConfig} [config] - The wallet configuration.
    */
-  constructor(
-    seedOrSigner: string | Uint8Array | ISigner,
-    config?: WalletConfig,
-  );
+  constructor(seed: string | Uint8Array, config?: WalletConfig);
+  /**
+   * Creates a new wallet manager from a default signer.
+   *
+   * @param {ISigner} signer - The default signer.
+   * @param {WalletConfig} [config] - The wallet configuration.
+   */
+  constructor(signer: ISigner, config?: WalletConfig);
   /** @private */
   private _seed: Uint8Array | undefined;
   /**
@@ -49,7 +50,7 @@ export default abstract class WalletManager {
    */
   protected _defaultSigner: ISigner | undefined;
   /**
-   * A map between signer names and signers added via {@link createSigner}.
+   * A map between signer names and signers added via {@link addSigner}.
    *
    * @protected
    * @type {Record<string, ISigner>}
@@ -84,11 +85,11 @@ export default abstract class WalletManager {
    * @param {ISigner} signer - The signer.
    * @throws {Error} If `signerName` is empty.
    */
-  createSigner(signerName: string, signer: ISigner): void;
+  addSigner(signerName: string, signer: ISigner): void;
   /**
    * Returns a signer. With no arguments, returns the default signer provided
    * at construction. With a name, returns the signer registered under that
-   * name via {@link createSigner}.
+   * name via {@link addSigner}.
    *
    * @param {string} [signerName] - The signer name. Omit to get the default.
    * @returns {ISigner} The signer.
@@ -104,7 +105,7 @@ export default abstract class WalletManager {
    * @param {Object} [options] - Account options.
    * @param {string} [options.signerName] - The signer name. Omit to use the default signer.
    * @returns {Promise<IWalletAccount>} The account.
-   * @throws {Error} If a signer name is given but no signer exists with that name.
+   * @throws {Error} If a signer name is given, but no signer exists with the given name.
    */
   abstract getAccount(
     index?: number,
@@ -120,7 +121,7 @@ export default abstract class WalletManager {
    * @param {Object} [options] - Account options.
    * @param {string} [options.signerName] - The signer name. Omit to use the default signer.
    * @returns {Promise<IWalletAccount>} The account.
-   * @throws {Error} If a signer name is given but no signer exists with that name.
+   * @throws {Error} If a signer name is given, but no signer exists with the given name.
    */
   abstract getAccountByPath(
     path: string,
