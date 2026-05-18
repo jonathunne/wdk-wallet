@@ -18,7 +18,7 @@ import * as bip39 from 'bip39'
 import { NotImplementedError } from './errors.js'
 
 /** @typedef {import('./wallet-account.js').IWalletAccount} IWalletAccount */
-/** @typedef {import('./isigner.js').ISigner} ISigner */
+/** @typedef {import('./signer.js').ISigner} ISigner */
 
 /**
  * @typedef {Object} WalletConfig
@@ -43,8 +43,11 @@ export default class WalletManager {
    * @param {string | Uint8Array | ISigner} seedOrSigner - A BIP-39 seed phrase, raw seed bytes, or a default signer.
    * @param {WalletConfig} [config] - The wallet configuration.
    */
-  constructor (seedOrSigner, config = { }) {
-    if (typeof seedOrSigner === 'string' || seedOrSigner instanceof Uint8Array) {
+  constructor (seedOrSigner, config = {}) {
+    if (
+      typeof seedOrSigner === 'string' ||
+      seedOrSigner instanceof Uint8Array
+    ) {
       if (typeof seedOrSigner === 'string') {
         if (!WalletManager.isValidSeedPhrase(seedOrSigner)) {
           throw new Error('The seed phrase is invalid.')
