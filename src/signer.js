@@ -38,11 +38,7 @@ import { NotImplementedError } from './errors.js'
  */
 export class ISigner {
   /**
-   * Derive a child signer using a relative path.
-   *
-   * Example formats (chain-dependent):
-   *  - BIP-32/BIP-44 relative paths like "0'/0/0"
-   *  - Implementation-specific segmenting, as applicable
+   * Derive a child signer using a relative path (e.g., "0'/0/0").
    *
    * @param {string} relPath - The relative derivation path.
    * @param {WalletConfig} [cfg] - Optional chain-specific configuration.
