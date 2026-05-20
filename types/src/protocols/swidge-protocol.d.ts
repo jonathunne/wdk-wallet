@@ -18,8 +18,8 @@
  */
 /**
  * @typedef {Object} SwidgeCommonOptions
- * @property {string} fromToken - The address of the source token.
- * @property {string} toToken - The address of the destination token.
+ * @property {string} fromToken - The provider-specific identifier or address of the source token.
+ * @property {string} toToken - The provider-specific identifier or address of the destination token.
  * @property {string | number} toChain - The identifier of the destination chain.
  * @property {string} [recipient] - The address that will receive the output tokens.
  * @property {number} [slippage] - The maximum acceptable slippage as a decimal (e.g., 0.01 for 1%).
@@ -86,6 +86,31 @@
  * @property {SwidgeTransaction[]} [transactions] - Transactions associated with the swidge.
  * @property {object} [providerData] - Opaque provider-specific data.
  */
+/**
+ * @typedef {Object} SwidgeSupportedChain
+ * @property {string | number} id - The provider-specific chain identifier.
+ * @property {string} name - The human-readable chain name.
+ * @property {string} [type] - The chain or virtual machine type (e.g., 'evm', 'svm', 'utxo').
+ * @property {string} [nativeToken] - The symbol of the chain's native token.
+ * @property {object} [providerData] - Opaque provider-specific metadata.
+ */
+/**
+ * @typedef {Object} SwidgeSupportedToken
+ * @property {string} token - The provider-specific token identifier to use in swidge operations.
+ * @property {string | number} chain - The chain on which the token is available.
+ * @property {string} symbol - The token symbol.
+ * @property {number} decimals - The number of decimal places for the token's base unit.
+ * @property {string} [address] - The token contract address, if applicable.
+ * @property {string} [name] - The token's full name.
+ * @property {object} [providerData] - Opaque provider-specific metadata.
+ */
+/**
+ * @typedef {Object} SwidgeSupportedTokensOptions
+ * @property {string | number} [chain] - Filters tokens by chain.
+ * @property {string | number} [fromChain] - The optional source chain for route-scoped discovery.
+ * @property {string} [fromToken] - The optional source token for route-scoped discovery.
+ * @property {string | number} [toChain] - The optional destination chain for route-scoped discovery.
+ */
 /** @interface */
 export class ISwidgeProtocol {
     /**
@@ -111,6 +136,19 @@ export class ISwidgeProtocol {
      * @returns {Promise<SwidgeStatusResult>} The current swidge status.
      */
     getSwidgeStatus(id: string, options?: SwidgeStatusOptions): Promise<SwidgeStatusResult>;
+    /**
+     * Retrieves the chains supported by the provider for swidge operations.
+     *
+     * @returns {Promise<SwidgeSupportedChain[]>} The supported chains.
+     */
+    getSupportedChains(): Promise<SwidgeSupportedChain[]>;
+    /**
+     * Retrieves the tokens supported by the provider for swidge operations.
+     *
+     * @param {SwidgeSupportedTokensOptions} [options] - Optional filters for chain- or route-scoped token discovery.
+     * @returns {Promise<SwidgeSupportedToken[]>} The supported tokens.
+     */
+    getSupportedTokens(options?: SwidgeSupportedTokensOptions): Promise<SwidgeSupportedToken[]>;
 }
 /**
  * @abstract
@@ -173,6 +211,21 @@ export default class SwidgeProtocol implements ISwidgeProtocol {
      * @returns {Promise<SwidgeStatusResult>} The current swidge status.
      */
     getSwidgeStatus(id: string, options?: SwidgeStatusOptions): Promise<SwidgeStatusResult>;
+    /**
+     * Retrieves the chains supported by the provider for swidge operations.
+     *
+     * @abstract
+     * @returns {Promise<SwidgeSupportedChain[]>} The supported chains.
+     */
+    getSupportedChains(): Promise<SwidgeSupportedChain[]>;
+    /**
+     * Retrieves the tokens supported by the provider for swidge operations.
+     *
+     * @abstract
+     * @param {SwidgeSupportedTokensOptions} [options] - Optional filters for chain- or route-scoped token discovery.
+     * @returns {Promise<SwidgeSupportedToken[]>} The supported tokens.
+     */
+    getSupportedTokens(options?: SwidgeSupportedTokensOptions): Promise<SwidgeSupportedToken[]>;
 }
 export type IWalletAccountReadOnly = import("../wallet-account-read-only.js").IWalletAccountReadOnly;
 export type IWalletAccount = import("../wallet-account.js").IWalletAccount;
@@ -191,11 +244,11 @@ export type SwidgeProtocolConfig = {
 export type SwidgeOptions = SwidgeCommonOptions & (SwidgeExactInOptions | SwidgeExactOutOptions);
 export type SwidgeCommonOptions = {
     /**
-     * - The address of the source token.
+     * - The provider-specific identifier or address of the source token.
      */
     fromToken: string;
     /**
-     * - The address of the destination token.
+     * - The provider-specific identifier or address of the destination token.
      */
     toToken: string;
     /**
@@ -378,4 +431,74 @@ export type SwidgeStatusResult = {
      * - Opaque provider-specific data.
      */
     providerData?: object | undefined;
+};
+export type SwidgeSupportedChain = {
+    /**
+     * - The provider-specific chain identifier.
+     */
+    id: string | number;
+    /**
+     * - The human-readable chain name.
+     */
+    name: string;
+    /**
+     * - The chain or virtual machine type (e.g., 'evm', 'svm', 'utxo').
+     */
+    type?: string | undefined;
+    /**
+     * - The symbol of the chain's native token.
+     */
+    nativeToken?: string | undefined;
+    /**
+     * - Opaque provider-specific metadata.
+     */
+    providerData?: object | undefined;
+};
+export type SwidgeSupportedToken = {
+    /**
+     * - The provider-specific token identifier to use in swidge operations.
+     */
+    token: string;
+    /**
+     * - The chain on which the token is available.
+     */
+    chain: string | number;
+    /**
+     * - The token symbol.
+     */
+    symbol: string;
+    /**
+     * - The number of decimal places for the token's base unit.
+     */
+    decimals: number;
+    /**
+     * - The token contract address, if applicable.
+     */
+    address?: string | undefined;
+    /**
+     * - The token's full name.
+     */
+    name?: string | undefined;
+    /**
+     * - Opaque provider-specific metadata.
+     */
+    providerData?: object | undefined;
+};
+export type SwidgeSupportedTokensOptions = {
+    /**
+     * - Filters tokens by chain.
+     */
+    chain?: string | number | undefined;
+    /**
+     * - The optional source chain for route-scoped discovery.
+     */
+    fromChain?: string | number | undefined;
+    /**
+     * - The optional source token for route-scoped discovery.
+     */
+    fromToken?: string | undefined;
+    /**
+     * - The optional destination chain for route-scoped discovery.
+     */
+    toChain?: string | number | undefined;
 };

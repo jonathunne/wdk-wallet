@@ -41,8 +41,8 @@ import { NotImplementedError } from '../errors.js'
 
 /**
  * @typedef {Object} SwidgeCommonOptions
- * @property {string} fromToken - The address of the source token.
- * @property {string} toToken - The address of the destination token.
+ * @property {string} fromToken - The provider-specific identifier or address of the source token.
+ * @property {string} toToken - The provider-specific identifier or address of the destination token.
  * @property {string | number} toChain - The identifier of the destination chain.
  * @property {string} [recipient] - The address that will receive the output tokens.
  * @property {number} [slippage] - The maximum acceptable slippage as a decimal (e.g., 0.01 for 1%).
@@ -118,6 +118,34 @@ import { NotImplementedError } from '../errors.js'
  * @property {object} [providerData] - Opaque provider-specific data.
  */
 
+/**
+ * @typedef {Object} SwidgeSupportedChain
+ * @property {string | number} id - The provider-specific chain identifier.
+ * @property {string} name - The human-readable chain name.
+ * @property {string} [type] - The chain or virtual machine type (e.g., 'evm', 'svm', 'utxo').
+ * @property {string} [nativeToken] - The symbol of the chain's native token.
+ * @property {object} [providerData] - Opaque provider-specific metadata.
+ */
+
+/**
+ * @typedef {Object} SwidgeSupportedToken
+ * @property {string} token - The provider-specific token identifier to use in swidge operations.
+ * @property {string | number} chain - The chain on which the token is available.
+ * @property {string} symbol - The token symbol.
+ * @property {number} decimals - The number of decimal places for the token's base unit.
+ * @property {string} [address] - The token contract address, if applicable.
+ * @property {string} [name] - The token's full name.
+ * @property {object} [providerData] - Opaque provider-specific metadata.
+ */
+
+/**
+ * @typedef {Object} SwidgeSupportedTokensOptions
+ * @property {string | number} [chain] - Filters tokens by chain.
+ * @property {string | number} [fromChain] - The optional source chain for route-scoped discovery.
+ * @property {string} [fromToken] - The optional source token for route-scoped discovery.
+ * @property {string | number} [toChain] - The optional destination chain for route-scoped discovery.
+ */
+
 /** @interface */
 export class ISwidgeProtocol {
   /**
@@ -150,6 +178,25 @@ export class ISwidgeProtocol {
    */
   async getSwidgeStatus (id, options) {
     throw new NotImplementedError('getSwidgeStatus(id, options)')
+  }
+
+  /**
+   * Retrieves the chains supported by the provider for swidge operations.
+   *
+   * @returns {Promise<SwidgeSupportedChain[]>} The supported chains.
+   */
+  async getSupportedChains () {
+    throw new NotImplementedError('getSupportedChains()')
+  }
+
+  /**
+   * Retrieves the tokens supported by the provider for swidge operations.
+   *
+   * @param {SwidgeSupportedTokensOptions} [options] - Optional filters for chain- or route-scoped token discovery.
+   * @returns {Promise<SwidgeSupportedToken[]>} The supported tokens.
+   */
+  async getSupportedTokens (options) {
+    throw new NotImplementedError('getSupportedTokens(options)')
   }
 }
 
@@ -224,5 +271,26 @@ export default class SwidgeProtocol {
    */
   async getSwidgeStatus (id, options) {
     throw new NotImplementedError('getSwidgeStatus(id, options)')
+  }
+
+  /**
+   * Retrieves the chains supported by the provider for swidge operations.
+   *
+   * @abstract
+   * @returns {Promise<SwidgeSupportedChain[]>} The supported chains.
+   */
+  async getSupportedChains () {
+    throw new NotImplementedError('getSupportedChains()')
+  }
+
+  /**
+   * Retrieves the tokens supported by the provider for swidge operations.
+   *
+   * @abstract
+   * @param {SwidgeSupportedTokensOptions} [options] - Optional filters for chain- or route-scoped token discovery.
+   * @returns {Promise<SwidgeSupportedToken[]>} The supported tokens.
+   */
+  async getSupportedTokens (options) {
+    throw new NotImplementedError('getSupportedTokens(options)')
   }
 }

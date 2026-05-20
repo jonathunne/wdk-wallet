@@ -64,6 +64,9 @@
 /** @typedef {import('./swidge-protocol.js').SwidgeResult} SwidgeResult */
 /** @typedef {import('./swidge-protocol.js').SwidgeStatusOptions} SwidgeStatusOptions */
 /** @typedef {import('./swidge-protocol.js').SwidgeStatusResult} SwidgeStatusResult */
+/** @typedef {import('./swidge-protocol.js').SwidgeSupportedChain} SwidgeSupportedChain */
+/** @typedef {import('./swidge-protocol.js').SwidgeSupportedToken} SwidgeSupportedToken */
+/** @typedef {import('./swidge-protocol.js').SwidgeSupportedTokensOptions} SwidgeSupportedTokensOptions */
 
 export { default as SwapProtocol, ISwapProtocol } from './swap-protocol.js'
 
