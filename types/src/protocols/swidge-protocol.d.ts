@@ -51,6 +51,11 @@
  * @property {'source' | 'destination' | 'approval' | 'refund' | 'other'} [type] - The role of the transaction within the swidge.
  */
 /**
+ * Represents a single logical swidge operation from the consumer's perspective.
+ * Providers that internally decompose the operation into multiple sequential transactions
+ * should encapsulate that decomposition behind a single quote
+ * and handle the step-by-step execution within `executeSwidge`.
+ *
  * @typedef {Object} SwidgeQuote
  * @property {bigint} fromTokenAmount - The amount of source tokens to spend.
  * @property {bigint} toTokenAmount - The estimated amount of destination tokens to receive.
@@ -61,7 +66,7 @@
  * @property {number} [estimatedDuration] - Estimated duration in seconds.
  * @property {number} [expiry] - Unix timestamp (seconds) at which the quote expires.
  * @property {number} [priceImpact] - Provider-reported estimated price impact as a decimal (e.g., 0.01 for 1%).
- * @property {object} providerData - Opaque provider-specific data required to execute the swidge.
+ * @property {object} [providerData] - Opaque provider-specific data required to execute the swidge.
  */
 /**
  * @typedef {Object} SwidgeResult
@@ -108,7 +113,6 @@
  */
 /**
  * @typedef {Object} SwidgeSupportedTokensOptions
- * @property {string | number} [chain] - Filters tokens by chain.
  * @property {string | number} [fromChain] - The optional source chain for route-scoped discovery.
  * @property {string} [fromToken] - The optional source token for route-scoped discovery.
  * @property {string | number} [toChain] - The optional destination chain for route-scoped discovery.
@@ -158,6 +162,14 @@ export class ISwidgeProtocol {
  */
 export default class SwidgeProtocol implements ISwidgeProtocol {
     /**
+     * Creates a new swidge protocol without binding it to a wallet account.
+     *
+     * @overload
+     * @param {undefined} [account] - The wallet account to use to interact with the protocol.
+     * @param {SwidgeProtocolConfig} [config] - The swidge protocol configuration.
+     */
+    constructor(account?: undefined, config?: SwidgeProtocolConfig | undefined);
+    /**
      * Creates a new read-only swidge protocol.
      *
      * @overload
@@ -177,9 +189,9 @@ export default class SwidgeProtocol implements ISwidgeProtocol {
      * The wallet account to use to interact with the protocol.
      *
      * @protected
-     * @type {IWalletAccountReadOnly | IWalletAccount}
+     * @type {IWalletAccountReadOnly | IWalletAccount | undefined}
      */
-    protected _account: IWalletAccountReadOnly | IWalletAccount;
+    protected _account: IWalletAccountReadOnly | IWalletAccount | undefined;
     /**
      * The swidge protocol configuration.
      *
@@ -370,7 +382,7 @@ export type SwidgeQuote = {
     /**
      * - Opaque provider-specific data required to execute the swidge.
      */
-    providerData: object;
+    providerData?: object | undefined;
 };
 export type SwidgeResult = {
     /**
@@ -495,10 +507,6 @@ export type SwidgeSupportedToken = {
     providerData?: object | undefined;
 };
 export type SwidgeSupportedTokensOptions = {
-    /**
-     * - Filters tokens by chain.
-     */
-    chain?: string | number | undefined;
     /**
      * - The optional source chain for route-scoped discovery.
      */

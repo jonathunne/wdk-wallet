@@ -79,6 +79,11 @@ import { NotImplementedError } from '../errors.js'
  */
 
 /**
+ * Represents a single logical swidge operation from the consumer's perspective.
+ * Providers that internally decompose the operation into multiple sequential transactions
+ * should encapsulate that decomposition behind a single quote
+ * and handle the step-by-step execution within `executeSwidge`.
+ *
  * @typedef {Object} SwidgeQuote
  * @property {bigint} fromTokenAmount - The amount of source tokens to spend.
  * @property {bigint} toTokenAmount - The estimated amount of destination tokens to receive.
@@ -89,7 +94,7 @@ import { NotImplementedError } from '../errors.js'
  * @property {number} [estimatedDuration] - Estimated duration in seconds.
  * @property {number} [expiry] - Unix timestamp (seconds) at which the quote expires.
  * @property {number} [priceImpact] - Provider-reported estimated price impact as a decimal (e.g., 0.01 for 1%).
- * @property {object} providerData - Opaque provider-specific data required to execute the swidge.
+ * @property {object} [providerData] - Opaque provider-specific data required to execute the swidge.
  */
 
 /**
@@ -142,7 +147,6 @@ import { NotImplementedError } from '../errors.js'
 
 /**
  * @typedef {Object} SwidgeSupportedTokensOptions
- * @property {string | number} [chain] - Filters tokens by chain.
  * @property {string | number} [fromChain] - The optional source chain for route-scoped discovery.
  * @property {string} [fromToken] - The optional source token for route-scoped discovery.
  * @property {string | number} [toChain] - The optional destination chain for route-scoped discovery.
@@ -208,6 +212,14 @@ export class ISwidgeProtocol {
  */
 export default class SwidgeProtocol {
   /**
+   * Creates a new swidge protocol without binding it to a wallet account.
+   *
+   * @overload
+   * @param {undefined} [account] - The wallet account to use to interact with the protocol.
+   * @param {SwidgeProtocolConfig} [config] - The swidge protocol configuration.
+   */
+
+  /**
    * Creates a new read-only swidge protocol.
    *
    * @overload
@@ -227,7 +239,7 @@ export default class SwidgeProtocol {
      * The wallet account to use to interact with the protocol.
      *
      * @protected
-     * @type {IWalletAccountReadOnly | IWalletAccount}
+     * @type {IWalletAccountReadOnly | IWalletAccount | undefined}
      */
     this._account = account
 
