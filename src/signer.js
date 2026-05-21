@@ -16,9 +16,7 @@
 import { NotImplementedError } from './errors.js'
 
 /**
- * A minimal, cross-chain signer interface. Chain-specific signers can extend
- * this contract with additional capabilities (e.g., signTransaction, signPsbt),
- * which are intentionally kept out of the base to remain chain-agnostic.
+ * A minimal, cross-chain signer interface.
  *
  * @interface
  */
