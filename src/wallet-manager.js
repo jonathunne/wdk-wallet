@@ -186,7 +186,7 @@ export default class WalletManager {
    * @abstract
    * @param {string} path - The derivation path (e.g. "0'/0/0").
    * @param {Object} [options] - Account options.
-   * @param {string} [options.signerName] - The signer name. Omit to use the default signer.
+   * @param {string} [options.signerName] - The signer name.
    * @returns {Promise<IWalletAccount>} The account.
    * @throws {Error} If a signer name is given, but no signer exists with the given name.
    */
