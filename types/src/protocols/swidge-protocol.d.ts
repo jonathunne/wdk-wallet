@@ -51,10 +51,9 @@
  * @property {'source' | 'destination' | 'approval' | 'refund' | 'other'} [type] - The role of the transaction within the swidge.
  */
 /**
- * Represents a single logical swidge operation from the consumer's perspective.
+ * Non-binding quote for a swidge operation.
  * Providers that internally decompose the operation into multiple sequential transactions
- * should encapsulate that decomposition behind a single quote
- * and handle the step-by-step execution within `swidge`.
+ * should encapsulate that decomposition behind a single quote.
  *
  * @typedef {Object} SwidgeQuote
  * @property {bigint} fromTokenAmount - The amount of source tokens to spend.
@@ -66,7 +65,7 @@
  * @property {number} [estimatedDuration] - Estimated duration in seconds.
  * @property {number} [expiry] - Unix timestamp (seconds) at which the quote expires.
  * @property {number} [priceImpact] - Provider-reported estimated price impact as a decimal (e.g., 0.01 for 1%).
- * @property {Record<string, unknown>} [providerData] - Opaque provider-specific data required to execute the swidge.
+ * @property {Record<string, unknown>} [providerData] - Opaque provider-specific quote metadata.
  */
 /**
  * @typedef {Object} SwidgeResult
@@ -120,20 +119,22 @@
 /** @interface */
 export class ISwidgeProtocol {
     /**
-     * Quotes a cross-chain swap/bridge operation.
+     * Quotes the estimated costs and output of a cross-chain swap/bridge operation.
+     * Returns a non-binding quote; the actual execution is performed
+     * by {@link swidge}.
      *
      * @param {SwidgeOptions} options - The swidge options.
      * @returns {Promise<SwidgeQuote>} The quoted swidge details.
      */
     quoteSwidge(options: SwidgeOptions): Promise<SwidgeQuote>;
     /**
-     * Executes a previously quoted swidge.
+     * Executes a swidge operation.
      *
-     * @param {SwidgeQuote} quote - The quote returned by quoteSwidge.
+     * @param {SwidgeOptions} options - The swidge options.
      * @param {SwidgeProtocolConfig} [config] - Optional fee limits for the execution.
      * @returns {Promise<SwidgeResult>} The swidge execution result.
      */
-    swidge(quote: SwidgeQuote, config?: SwidgeProtocolConfig): Promise<SwidgeResult>;
+    swidge(options: SwidgeOptions, config?: SwidgeProtocolConfig): Promise<SwidgeResult>;
     /**
      * Retrieves the current status of an in-flight swidge.
      *
@@ -201,7 +202,9 @@ export default class SwidgeProtocol implements ISwidgeProtocol {
      */
     protected _config: SwidgeProtocolConfig;
     /**
-     * Quotes a cross-chain swap/bridge operation.
+     * Quotes the estimated costs and output of a swidge operation.
+     * Returns a non-binding quote; the actual execution is performed
+     * by {@link swidge}.
      *
      * @abstract
      * @param {SwidgeOptions} options - The swidge options.
@@ -209,14 +212,14 @@ export default class SwidgeProtocol implements ISwidgeProtocol {
      */
     quoteSwidge(options: SwidgeOptions): Promise<SwidgeQuote>;
     /**
-     * Executes a previously quoted swidge.
+     * Executes a swidge operation.
      *
      * @abstract
-     * @param {SwidgeQuote} quote - The quote returned by quoteSwidge.
+     * @param {SwidgeOptions} options - The swidge options.
      * @param {SwidgeProtocolConfig} [config] - Optional fee limits for the execution.
      * @returns {Promise<SwidgeResult>} The swidge execution result.
      */
-    swidge(quote: SwidgeQuote, config?: SwidgeProtocolConfig): Promise<SwidgeResult>;
+    swidge(options: SwidgeOptions, config?: SwidgeProtocolConfig): Promise<SwidgeResult>;
     /**
      * Retrieves the current status of an in-flight swidge.
      *
