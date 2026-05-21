@@ -1,14 +1,3 @@
-/** @typedef {import('./wallet-account.js').IWalletAccount} IWalletAccount */
-/** @typedef {import('./signer.js').ISigner} ISigner */
-/**
- * @typedef {Object} WalletConfig
- * @property {number | bigint} [transferMaxFee] - The maximum fee amount for transfer operations.
- */
-/**
- * @typedef {Object} FeeRates
- * @property {bigint} normal - The fee rate for transaction sent with normal priority.
- * @property {bigint} fast - The fee rate for transaction sent with fast priority.
- */
 /** @abstract */
 export default abstract class WalletManager {
   /**

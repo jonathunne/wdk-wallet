@@ -1,7 +1,5 @@
 /**
- * A minimal, cross-chain signer interface. Chain-specific signers can extend
- * this contract with additional capabilities (e.g., signTransaction, signPsbt),
- * which are intentionally kept out of the base to remain chain-agnostic.
+ * A minimal, cross-chain signer interface.
  *
  * @interface
  */
@@ -22,7 +20,6 @@ export class ISigner {
     getAddress(): Promise<string>;
     /**
      * Disposes the signer and clears any secret material from memory.
-     * Implementations should be idempotent (safe to call more than once).
      */
     dispose(): void;
 }

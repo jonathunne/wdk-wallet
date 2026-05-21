@@ -43,7 +43,6 @@ export class ISigner {
 
   /**
    * Disposes the signer and clears any secret material from memory.
-   * Implementations should be idempotent (safe to call more than once).
    */
   dispose () {
     throw new NotImplementedError('dispose()')
