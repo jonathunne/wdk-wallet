@@ -10,8 +10,6 @@
  */
 /**
  * @typedef {Object} SwidgeProtocolConfig
- * @property {number | bigint} [swidgeMaxFee] - The maximum total fee for swidge operations.
- * @property {number | bigint} [swidgeMaxProtocolFee] - The maximum protocol fee for swidge operations.
  */
 /**
  * @typedef {SwidgeCommonOptions & (SwidgeExactInOptions | SwidgeExactOutOptions)} SwidgeOptions
@@ -59,9 +57,7 @@
  * @property {bigint} fromTokenAmount - The amount of source tokens to spend.
  * @property {bigint} toTokenAmount - The estimated amount of destination tokens to receive.
  * @property {bigint} toTokenAmountMin - The minimum guaranteed amount after slippage.
- * @property {bigint} [fee] - The total aggregated fee.
- * @property {bigint} [protocolFee] - The protocol-specific fee portion.
- * @property {SwidgeFee[]} [fees] - Itemized fee breakdown.
+ * @property {SwidgeFee[]} fees - Itemised fee breakdown.
  * @property {number} [estimatedDuration] - Estimated duration in seconds.
  * @property {number} [expiry] - Unix timestamp (seconds) at which the quote expires.
  * @property {number} [priceImpact] - Provider-reported estimated price impact as a decimal (e.g., 0.01 for 1%).
@@ -71,9 +67,7 @@
  * @typedef {Object} SwidgeResult
  * @property {string} id - The unique swidge execution identifier.
  * @property {string} [hash] - The primary transaction hash (if available immediately).
- * @property {bigint} [fee] - The total aggregated fee charged.
- * @property {bigint} [protocolFee] - The protocol-specific fee charged.
- * @property {SwidgeFee[]} [fees] - Itemized fee breakdown.
+ * @property {SwidgeFee[]} fees - Itemised fee breakdown.
  * @property {SwidgeTransaction[]} [transactions] - Transactions produced by the swidge execution.
  * @property {bigint} fromTokenAmount - The actual amount of source tokens spent.
  * @property {bigint} toTokenAmount - The actual or expected amount of destination tokens.
@@ -131,7 +125,7 @@ export class ISwidgeProtocol {
      * Executes a swidge operation.
      *
      * @param {SwidgeOptions} options - The swidge options.
-     * @param {SwidgeProtocolConfig} [config] - Optional fee limits for the execution.
+     * @param {SwidgeProtocolConfig} [config] - Optional provider-specific execution configuration.
      * @returns {Promise<SwidgeResult>} The swidge execution result.
      */
     swidge(options: SwidgeOptions, config?: SwidgeProtocolConfig): Promise<SwidgeResult>;
@@ -216,7 +210,7 @@ export default class SwidgeProtocol implements ISwidgeProtocol {
      *
      * @abstract
      * @param {SwidgeOptions} options - The swidge options.
-     * @param {SwidgeProtocolConfig} [config] - Optional fee limits for the execution.
+     * @param {SwidgeProtocolConfig} [config] - Optional provider-specific execution configuration.
      * @returns {Promise<SwidgeResult>} The swidge execution result.
      */
     swidge(options: SwidgeOptions, config?: SwidgeProtocolConfig): Promise<SwidgeResult>;
@@ -250,16 +244,7 @@ export type IWalletAccountReadOnly = import("../wallet-account-read-only.js").IW
 export type IWalletAccount = import("../wallet-account.js").IWalletAccount;
 export type SwidgeStatus = "pending" | "action-required" | "completed" | "failed" | "refund-pending" | "refunded" | "cancelled" | "expired" | "partial";
 export type SwidgeFeeType = "gas" | "protocol" | "bridge" | "relayer" | "application" | "affiliate" | "liquidity" | "other";
-export type SwidgeProtocolConfig = {
-    /**
-     * - The maximum total fee for swidge operations.
-     */
-    swidgeMaxFee?: number | bigint | undefined;
-    /**
-     * - The maximum protocol fee for swidge operations.
-     */
-    swidgeMaxProtocolFee?: number | bigint | undefined;
-};
+export type SwidgeProtocolConfig = {};
 export type SwidgeOptions = SwidgeCommonOptions & (SwidgeExactInOptions | SwidgeExactOutOptions);
 export type SwidgeCommonOptions = {
     /**
@@ -361,17 +346,9 @@ export type SwidgeQuote = {
      */
     toTokenAmountMin: bigint;
     /**
-     * - The total aggregated fee.
+     * - Itemised fee breakdown.
      */
-    fee?: bigint | undefined;
-    /**
-     * - The protocol-specific fee portion.
-     */
-    protocolFee?: bigint | undefined;
-    /**
-     * - Itemized fee breakdown.
-     */
-    fees?: SwidgeFee[] | undefined;
+    fees: SwidgeFee[];
     /**
      * - Estimated duration in seconds.
      */
@@ -385,7 +362,7 @@ export type SwidgeQuote = {
      */
     priceImpact?: number | undefined;
     /**
-     * - Opaque provider-specific data required to execute the swidge.
+     * - Opaque provider-specific quote metadata.
      */
     providerData?: Record<string, unknown> | undefined;
 };
@@ -399,17 +376,9 @@ export type SwidgeResult = {
      */
     hash?: string | undefined;
     /**
-     * - The total aggregated fee charged.
+     * - Itemised fee breakdown.
      */
-    fee?: bigint | undefined;
-    /**
-     * - The protocol-specific fee charged.
-     */
-    protocolFee?: bigint | undefined;
-    /**
-     * - Itemized fee breakdown.
-     */
-    fees?: SwidgeFee[] | undefined;
+    fees: SwidgeFee[];
     /**
      * - Transactions produced by the swidge execution.
      */

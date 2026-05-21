@@ -31,8 +31,6 @@ import { NotImplementedError } from '../errors.js'
 
 /**
  * @typedef {Object} SwidgeProtocolConfig
- * @property {number | bigint} [swidgeMaxFee] - The maximum total fee for swidge operations.
- * @property {number | bigint} [swidgeMaxProtocolFee] - The maximum protocol fee for swidge operations.
  */
 
 /**
@@ -87,9 +85,7 @@ import { NotImplementedError } from '../errors.js'
  * @property {bigint} fromTokenAmount - The amount of source tokens to spend.
  * @property {bigint} toTokenAmount - The estimated amount of destination tokens to receive.
  * @property {bigint} toTokenAmountMin - The minimum guaranteed amount after slippage.
- * @property {bigint} [fee] - The total aggregated fee.
- * @property {bigint} [protocolFee] - The protocol-specific fee portion.
- * @property {SwidgeFee[]} [fees] - Itemized fee breakdown.
+ * @property {SwidgeFee[]} fees - Itemised fee breakdown.
  * @property {number} [estimatedDuration] - Estimated duration in seconds.
  * @property {number} [expiry] - Unix timestamp (seconds) at which the quote expires.
  * @property {number} [priceImpact] - Provider-reported estimated price impact as a decimal (e.g., 0.01 for 1%).
@@ -100,9 +96,7 @@ import { NotImplementedError } from '../errors.js'
  * @typedef {Object} SwidgeResult
  * @property {string} id - The unique swidge execution identifier.
  * @property {string} [hash] - The primary transaction hash (if available immediately).
- * @property {bigint} [fee] - The total aggregated fee charged.
- * @property {bigint} [protocolFee] - The protocol-specific fee charged.
- * @property {SwidgeFee[]} [fees] - Itemized fee breakdown.
+ * @property {SwidgeFee[]} fees - Itemised fee breakdown.
  * @property {SwidgeTransaction[]} [transactions] - Transactions produced by the swidge execution.
  * @property {bigint} fromTokenAmount - The actual amount of source tokens spent.
  * @property {bigint} toTokenAmount - The actual or expected amount of destination tokens.
@@ -169,7 +163,7 @@ export class ISwidgeProtocol {
    * Executes a swidge operation.
    *
    * @param {SwidgeOptions} options - The swidge options.
-   * @param {SwidgeProtocolConfig} [config] - Optional fee limits for the execution.
+   * @param {SwidgeProtocolConfig} [config] - Optional provider-specific execution configuration.
    * @returns {Promise<SwidgeResult>} The swidge execution result.
    */
   async swidge (options, config) {
@@ -272,7 +266,7 @@ export default class SwidgeProtocol {
    *
    * @abstract
    * @param {SwidgeOptions} options - The swidge options.
-   * @param {SwidgeProtocolConfig} [config] - Optional fee limits for the execution.
+   * @param {SwidgeProtocolConfig} [config] - Optional provider-specific execution configuration.
    * @returns {Promise<SwidgeResult>} The swidge execution result.
    */
   async swidge (options, config) {
