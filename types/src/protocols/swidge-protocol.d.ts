@@ -213,17 +213,15 @@ export default class SwidgeProtocol implements ISwidgeProtocol, ISwapProtocol, I
      */
     quoteSwap(options: SwapOptions): Promise<Omit<SwapResult, "hash">>;
     /**
-     * Bridges a token to a different blockchain.
+     * Bridges a token to a different blockchain by delegating to {@link swidge}.
      *
-     * @abstract
      * @param {BridgeOptions} options - The bridge's options.
      * @returns {Promise<BridgeResult>} The bridge's result.
      */
     bridge(options: BridgeOptions): Promise<BridgeResult>;
     /**
-     * Quotes the costs of a bridge operation.
+     * Quotes the costs of a bridge operation by delegating to {@link quoteSwidge}.
      *
-     * @abstract
      * @param {BridgeOptions} options - The bridge's options.
      * @returns {Promise<Omit<BridgeResult, 'hash'>>} The bridge's quotes.
      */

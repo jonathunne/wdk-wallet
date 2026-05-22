@@ -304,25 +304,45 @@ export default class SwidgeProtocol {
   }
 
   /**
-   * Bridges a token to a different blockchain.
+   * Bridges a token to a different blockchain by delegating to {@link swidge}.
    *
-   * @abstract
    * @param {BridgeOptions} options - The bridge's options.
    * @returns {Promise<BridgeResult>} The bridge's result.
    */
   async bridge (options) {
-    throw new NotImplementedError('bridge(options)')
+    const { id: hash, fees } = await this.swidge({
+      fromToken: options.token,
+      toToken: options.token,
+      toChain: options.targetChain,
+      recipient: options.recipient,
+      fromTokenAmount: options.amount
+    })
+    const fee = fees.filter(f => f.type === 'network')
+      .reduce((acc, { amount }) => acc + amount, 0n)
+    const bridgeFee = fees.filter(f => f.type === 'protocol')
+      .reduce((acc, { amount }) => acc + amount, 0n)
+    return { hash, fee, bridgeFee }
   }
 
   /**
-   * Quotes the costs of a bridge operation.
+   * Quotes the costs of a bridge operation by delegating to {@link quoteSwidge}.
    *
-   * @abstract
    * @param {BridgeOptions} options - The bridge's options.
    * @returns {Promise<Omit<BridgeResult, 'hash'>>} The bridge's quotes.
    */
   async quoteBridge (options) {
-    throw new NotImplementedError('quoteBridge(options)')
+    const { fees } = await this.quoteSwidge({
+      fromToken: options.token,
+      toToken: options.token,
+      toChain: options.targetChain,
+      recipient: options.recipient,
+      fromTokenAmount: options.amount
+    })
+    const fee = fees.filter(f => f.type === 'network')
+      .reduce((acc, { amount }) => acc + amount, 0n)
+    const bridgeFee = fees.filter(f => f.type === 'protocol')
+      .reduce((acc, { amount }) => acc + amount, 0n)
+    return { fee, bridgeFee }
   }
 
   /**
