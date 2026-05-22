@@ -24,7 +24,7 @@
  * @typedef {Object} SwidgeCommonOptions
  * @property {string} fromToken - The provider-specific identifier or address of the source token.
  * @property {string} toToken - The provider-specific identifier or address of the destination token.
- * @property {string | number} toChain - The identifier of the destination chain.
+ * @property {string | number} [toChain] - The identifier of the destination chain. If omitted, defaults to the source chain (same-chain swap).
  * @property {string} [recipient] - The address that will receive the output tokens.
  * @property {string} [refundAddress] - The address that will receive refunds if the tx cannot complete.
  * @property {number} [slippage] - The maximum acceptable slippage as a decimal (e.g., 0.01 for 1%).
@@ -110,40 +110,8 @@
  * @property {string} [fromToken] - The optional source token for route-scoped discovery.
  * @property {string | number} [toChain] - The optional destination chain for route-scoped discovery.
  */
-/**
- * @interface
- * @implements {ISwapProtocol}
- * @implements {IBridgeProtocol}
- */
-export class ISwidgeProtocol implements ISwapProtocol, IBridgeProtocol {
-    /**
-     * Swaps a pair of tokens.
-     *
-     * @param {SwapOptions} options - The swap's options.
-     * @returns {Promise<SwapResult>} The swap's result.
-     */
-    swap(options: SwapOptions): Promise<SwapResult>;
-    /**
-     * Quotes the costs of a swap operation.
-     *
-     * @param {SwapOptions} options - The swap's options.
-     * @returns {Promise<Omit<SwapResult, 'hash'>>} The swap's quotes.
-     */
-    quoteSwap(options: SwapOptions): Promise<Omit<SwapResult, "hash">>;
-    /**
-     * Bridges a token to a different blockchain.
-     *
-     * @param {BridgeOptions} options - The bridge's options.
-     * @returns {Promise<BridgeResult>} The bridge's result.
-     */
-    bridge(options: BridgeOptions): Promise<BridgeResult>;
-    /**
-     * Quotes the costs of a bridge operation.
-     *
-     * @param {BridgeOptions} options - The bridge's options.
-     * @returns {Promise<Omit<BridgeResult, 'hash'>>} The bridge's quotes.
-     */
-    quoteBridge(options: BridgeOptions): Promise<Omit<BridgeResult, "hash">>;
+/** @interface */
+export interface ISwidgeProtocol extends ISwapProtocol, IBridgeProtocol {
     /**
      * Quotes the estimated costs and output of a cross-chain swap/bridge operation.
      * Returns a non-binding quote; the actual execution is performed
@@ -230,17 +198,15 @@ export default class SwidgeProtocol implements ISwidgeProtocol, ISwapProtocol, I
      */
     protected _config: SwidgeProtocolConfig;
     /**
-     * Swaps a pair of tokens.
+     * Swaps a pair of tokens by delegating to {@link swidge}.
      *
-     * @abstract
      * @param {SwapOptions} options - The swap's options.
      * @returns {Promise<SwapResult>} The swap's result.
      */
     swap(options: SwapOptions): Promise<SwapResult>;
     /**
-     * Quotes the costs of a swap operation.
+     * Quotes the costs of a swap operation by delegating to {@link quoteSwidge}.
      *
-     * @abstract
      * @param {SwapOptions} options - The swap's options.
      * @returns {Promise<Omit<SwapResult, 'hash'>>} The swap's quotes.
      */
@@ -328,9 +294,9 @@ export type SwidgeCommonOptions = {
      */
     toToken: string;
     /**
-     * - The identifier of the destination chain.
+     * - The identifier of the destination chain. If omitted, defaults to the source chain (same-chain swap).
      */
-    toChain: string | number;
+    toChain?: string | number | undefined;
     /**
      * - The address that will receive the output tokens.
      */

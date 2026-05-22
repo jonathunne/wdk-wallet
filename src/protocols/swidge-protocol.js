@@ -49,7 +49,7 @@ import { NotImplementedError } from '../errors.js'
  * @typedef {Object} SwidgeCommonOptions
  * @property {string} fromToken - The provider-specific identifier or address of the source token.
  * @property {string} toToken - The provider-specific identifier or address of the destination token.
- * @property {string | number} toChain - The identifier of the destination chain.
+ * @property {string | number} [toChain] - The identifier of the destination chain. If omitted, defaults to the source chain (same-chain swap).
  * @property {string} [recipient] - The address that will receive the output tokens.
  * @property {string} [refundAddress] - The address that will receive refunds if the tx cannot complete.
  * @property {number} [slippage] - The maximum acceptable slippage as a decimal (e.g., 0.01 for 1%).
@@ -154,46 +154,6 @@ import { NotImplementedError } from '../errors.js'
  */
 export class ISwidgeProtocol {
   /**
-   * Swaps a pair of tokens.
-   *
-   * @param {SwapOptions} options - The swap's options.
-   * @returns {Promise<SwapResult>} The swap's result.
-   */
-  async swap (options) {
-    throw new NotImplementedError('swap(options)')
-  }
-
-  /**
-   * Quotes the costs of a swap operation.
-   *
-   * @param {SwapOptions} options - The swap's options.
-   * @returns {Promise<Omit<SwapResult, 'hash'>>} The swap's quotes.
-   */
-  async quoteSwap (options) {
-    throw new NotImplementedError('quoteSwap(options)')
-  }
-
-  /**
-   * Bridges a token to a different blockchain.
-   *
-   * @param {BridgeOptions} options - The bridge's options.
-   * @returns {Promise<BridgeResult>} The bridge's result.
-   */
-  async bridge (options) {
-    throw new NotImplementedError('bridge(options)')
-  }
-
-  /**
-   * Quotes the costs of a bridge operation.
-   *
-   * @param {BridgeOptions} options - The bridge's options.
-   * @returns {Promise<Omit<BridgeResult, 'hash'>>} The bridge's quotes.
-   */
-  async quoteBridge (options) {
-    throw new NotImplementedError('quoteBridge(options)')
-  }
-
-  /**
    * Quotes the estimated costs and output of a cross-chain swap/bridge operation.
    * Returns a non-binding quote; the actual execution is performed
    * by {@link swidge}.
@@ -297,25 +257,49 @@ export default class SwidgeProtocol {
   }
 
   /**
-   * Swaps a pair of tokens.
+   * Swaps a pair of tokens by delegating to {@link swidge}.
    *
-   * @abstract
    * @param {SwapOptions} options - The swap's options.
    * @returns {Promise<SwapResult>} The swap's result.
    */
   async swap (options) {
-    throw new NotImplementedError('swap(options)')
+    const swidgeOptions = {
+      fromToken: options.tokenIn,
+      toToken: options.tokenOut,
+      recipient: options.to
+    }
+    if (options.tokenInAmount !== undefined) {
+      swidgeOptions.fromTokenAmount = options.tokenInAmount
+    } else {
+      swidgeOptions.toTokenAmount = options.tokenOutAmount
+    }
+
+    const result = await this.swidge(swidgeOptions)
+    const fee = result.fees.reduce((acc, f) => acc + f.amount, 0n)
+    return { hash: result.id, fee, tokenInAmount: result.fromTokenAmount, tokenOutAmount: result.toTokenAmount }
   }
 
   /**
-   * Quotes the costs of a swap operation.
+   * Quotes the costs of a swap operation by delegating to {@link quoteSwidge}.
    *
-   * @abstract
    * @param {SwapOptions} options - The swap's options.
    * @returns {Promise<Omit<SwapResult, 'hash'>>} The swap's quotes.
    */
   async quoteSwap (options) {
-    throw new NotImplementedError('quoteSwap(options)')
+    const swidgeOptions = {
+      fromToken: options.tokenIn,
+      toToken: options.tokenOut,
+      recipient: options.to
+    }
+    if (options.tokenInAmount !== undefined) {
+      swidgeOptions.fromTokenAmount = options.tokenInAmount
+    } else {
+      swidgeOptions.toTokenAmount = options.tokenOutAmount
+    }
+
+    const quote = await this.quoteSwidge(swidgeOptions)
+    const fee = quote.fees.reduce((acc, f) => acc + f.amount, 0n)
+    return { fee, tokenInAmount: quote.fromTokenAmount, tokenOutAmount: quote.toTokenAmount }
   }
 
   /**
