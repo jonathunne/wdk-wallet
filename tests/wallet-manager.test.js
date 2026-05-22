@@ -139,6 +139,22 @@ describe('WalletManager', () => {
       expect(() => wallet.addSigner('', signer))
         .toThrow('Signer name is required.')
     })
+
+    test('should throw when the signer name is blank', () => {
+      const signer = new DummySigner()
+      const wallet = new DummyWalletManager(SEED_PHRASE)
+
+      expect(() => wallet.addSigner('   ', signer))
+        .toThrow('Signer name is required.')
+    })
+
+    test('should throw when the signer name is not a string', () => {
+      const signer = new DummySigner()
+      const wallet = new DummyWalletManager(SEED_PHRASE)
+
+      expect(() => wallet.addSigner(null, signer))
+        .toThrow('Signer name is required.')
+    })
   })
 
   describe('getSigner', () => {

@@ -72,7 +72,7 @@ export default abstract class WalletManager {
    *
    * @param {string} signerName - The signer name.
    * @param {ISigner} signer - The signer.
-   * @throws {Error} If `signerName` is empty.
+   * @throws {Error} If `signerName` is not a non-empty, non-blank string.
    */
   addSigner(signerName: string, signer: ISigner): void;
   /**
