@@ -264,18 +264,13 @@ export default class SwidgeProtocol {
    * @returns {Promise<SwapResult>} The swap's result.
    */
   async swap (options) {
-    const swidgeOptions = {
+    const result = await this.swidge({
       fromToken: options.tokenIn,
       toToken: options.tokenOut,
-      recipient: options.to
-    }
-    if (options.tokenInAmount !== undefined) {
-      swidgeOptions.fromTokenAmount = options.tokenInAmount
-    } else {
-      swidgeOptions.toTokenAmount = options.tokenOutAmount
-    }
-
-    const result = await this.swidge(swidgeOptions)
+      recipient: options.to,
+      fromTokenAmount: options.tokenInAmount,
+      toTokenAmount: options.tokenOutAmount
+    })
     const fee = result.fees.reduce((acc, f) => acc + f.amount, 0n)
     return { hash: result.id, fee, tokenInAmount: result.fromTokenAmount, tokenOutAmount: result.toTokenAmount }
   }
