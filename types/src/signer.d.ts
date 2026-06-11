@@ -13,7 +13,7 @@ export class ISigner {
      */
     derive(relPath: string): Promise<ISigner>;
     /**
-     * Signs a transaction. Concrete signers narrow `tx` to their chain-specific shape.
+     * Signs a transaction.
      *
      * @param {unknown} tx - The transaction to sign.
      * @returns {Promise<unknown>} The signed transaction.
