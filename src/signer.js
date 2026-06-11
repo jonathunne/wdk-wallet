@@ -33,6 +33,16 @@ export class ISigner {
   }
 
   /**
+   * Signs a transaction
+   *
+   * @param {Transaction} tx - The transaction to sign.
+   * @returns {Promise<unknown>} The signed transaction.
+   */
+  async signTransaction (tx) {
+    throw new NotImplementedError('signTransaction(tx)')
+  }
+
+  /**
    * Returns the signer's address.
    *
    * @returns {Promise<string>} The address.

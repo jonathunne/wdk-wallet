@@ -87,6 +87,14 @@ export default abstract class WalletManager {
    */
   getSigner(signerName?: string): ISigner;
   /**
+   * Returns a shallow copy of the map of signers registered via {@link addSigner}.
+   * The default signer is not included; use {@link getSigner} with no arguments
+   * to retrieve it.
+   *
+   * @returns {Record<string, ISigner>} A map of signer names to signers. Empty if no signers have been registered.
+   */
+  getSigners(): Record<string, ISigner>;
+  /**
    * Returns the wallet account at a specific index (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
    *
    * @param {number} [index] - The index of the account to get (default: 0).
