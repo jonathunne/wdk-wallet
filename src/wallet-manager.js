@@ -138,7 +138,7 @@ export default class WalletManager {
    */
   addSigner (signerName, signer) {
     if (typeof signerName !== 'string' || signerName.trim() === '') {
-      throw new Error('Signer name is required.')
+      throw new Error('The signer name cannot be an empty or blank string.')
     }
 
     this._signers[signerName] = signer
