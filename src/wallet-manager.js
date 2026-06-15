@@ -241,9 +241,7 @@ export default class WalletManager {
       }
     }
 
-    if (this._defaultSigner !== undefined) {
-      this._defaultSigner.dispose()
-    }
+    this._defaultSigner?.dispose()
 
     for (const signer of Object.values(this._signers)) {
       signer.dispose()
