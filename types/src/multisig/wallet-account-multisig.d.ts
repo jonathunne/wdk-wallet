@@ -37,7 +37,7 @@ export interface IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
      * @throws {ProviderError} If the provider fails to propose the transaction.
      * @throws {AccountNotOwnerError} If the account is not an owner of the multisig wallet.
      */
-    propose(tx: Transaction, transactionOptions?: MultisigTransactionOptions): Promise<MultisigProposal>;
+    propose(tx: Transaction, transactionOptions?: MultisigTransactionOptions): Promise<MultisigProposal & MultisigAutoExecuteResult>;
     /**
      * Approves a pending proposal.
      *
@@ -47,7 +47,7 @@ export interface IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
      * @throws {NoSuchElementError} If no message exists for the given id.
      * @throws {AccountNotOwnerError} If the account is not an owner of the multisig wallet.
      */
-    approveProposal(proposalId: string): Promise<MultisigProposal>;
+    approveProposal(proposalId: string): Promise<MultisigProposal & MultisigAutoExecuteResult>;
     /**
      * Rejects a pending proposal.
      *
