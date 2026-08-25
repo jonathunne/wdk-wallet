@@ -88,7 +88,7 @@ export class IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
    *
    * @param {Transaction} tx - The transaction.
    * @param {MultisigTransactionOptions} [transactionOptions] - The multisig transaction's options.
-   * @returns {Promise<MultisigProposal>} The created proposal; its `status` is `'executed'` when `autoExecute` ran to completion, otherwise `'pending'`.
+   * @returns {Promise<MultisigProposal & MultisigAutoExecuteResult>} The created proposal; its `status` is `'executed'` when `autoExecute` ran to completion, otherwise `'pending'`.
    * @throws {ValueError} If the transaction is not valid.
    * @throws {ProviderRequiredError} If the method requires a provider.
    * @throws {ProviderError} If the provider fails to propose the transaction.
@@ -102,7 +102,7 @@ export class IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
    * Approves a pending proposal.
    *
    * @param {string} proposalId - The proposal's id.
-   * @returns {Promise<MultisigProposal>} The multisig proposal.
+   * @returns {Promise<MultisigProposal & MultisigAutoExecuteResult>} The multisig proposal.
    * @throws {ValueError} If the proposal's identifier is not a valid id.
    * @throws {NoSuchElementError} If no message exists for the given id.
    * @throws {AccountNotOwnerError} If the account is not an owner of the multisig wallet.
