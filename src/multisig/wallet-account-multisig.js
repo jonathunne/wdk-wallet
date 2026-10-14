@@ -21,6 +21,7 @@ import { NotImplementedError } from './errors.js'
 /** @typedef {import('../wallet-account-read-only.js').TransactionResult} TransactionResult */
 
 /** @typedef {import('../wallet-account.js').KeyPair} KeyPair */
+/** @typedef {import('../disposable.js').IDisposable} IDisposable */
 
 /** @typedef {import('./wallet-account-read-only-multisig.js').MultisigProposal} MultisigProposal */
 
@@ -43,30 +44,26 @@ import { NotImplementedError } from './errors.js'
  * @property {TransactionResult} [transaction] - The on-chain transaction produced by this call, when the call itself settles on-chain — the execution transaction when a call triggers execution, or, on backends where every proposal/approval is its own on-chain transaction, that call's transaction. Undefined when the call only updates off-chain state. Its presence does not imply the proposal executed; execution is determined solely by `status`.
  */
 
-/** @interface */
+/**
+ * @interface
+ * @extends {IDisposable}
+ */
 export class IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
   /**
-   * The derivation path's index of this account.
+   * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)),
+   * or null if the account's signer is not bound to a BIP-44 position (e.g. private-key signers).
    *
-   * @type {number}
-   */
-  get index () {
-    throw new NotImplementedError('index')
-  }
-
-  /**
-   * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
-   *
-   * @type {string}
+   * @type {string | null}
    */
   get path () {
     throw new NotImplementedError('path')
   }
 
   /**
-   * The key pair of this account.
+   * The account's key pair, or null if the account's signer does not allow
+   * retrieving key material (e.g. hardware signers).
    *
-   * @type {KeyPair}
+   * @type {KeyPair | null}
    */
   get keyPair () {
     throw new NotImplementedError('keyPair')

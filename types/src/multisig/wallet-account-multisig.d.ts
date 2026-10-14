@@ -1,23 +1,22 @@
-/** @interface */
-export interface IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
+/**
+ * @interface
+ * @extends {IDisposable}
+ */
+export interface IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig, IDisposable {
     /**
-     * The derivation path's index of this account.
+     * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)),
+     * or null if the account's signer is not bound to a BIP-44 position (e.g. private-key signers).
      *
-     * @type {number}
+     * @type {string | null}
      */
-    get index(): number;
+    get path(): string | null;
     /**
-     * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
+     * The account's key pair, or null if the account's signer does not allow
+     * retrieving key material (e.g. hardware signers).
      *
-     * @type {string}
+     * @type {KeyPair | null}
      */
-    get path(): string;
-    /**
-     * The key pair of this account.
-     *
-     * @type {KeyPair}
-     */
-    get keyPair(): KeyPair;
+    get keyPair(): KeyPair | null;
     /**
      * Returns the signer's address.
      *
@@ -77,6 +76,7 @@ export interface IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
 export type Transaction = import("../wallet-account-read-only.js").Transaction;
 export type TransactionResult = import("../wallet-account-read-only.js").TransactionResult;
 export type KeyPair = import("../wallet-account.js").KeyPair;
+export type IDisposable = import("../disposable.js").IDisposable;
 export type MultisigProposal = import("./wallet-account-read-only-multisig.js").MultisigProposal;
 export type AccountNotOwnerError = import("./errors.js").AccountNotOwnerError;
 export type MaximumFeeExceededError = import("./errors.js").MaximumFeeExceededError;
