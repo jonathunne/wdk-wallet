@@ -1,6 +1,5 @@
 /**
  * @interface
- * @extends {IWalletAccountReadOnlyMultisig}
  * @extends {IDisposable}
  */
 export interface IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig, IDisposable {

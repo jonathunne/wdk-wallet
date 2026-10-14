@@ -46,7 +46,6 @@ import { NotImplementedError } from './errors.js'
 
 /**
  * @interface
- * @extends {IWalletAccountReadOnlyMultisig}
  * @extends {IDisposable}
  */
 export class IWalletAccountMultisig extends IWalletAccountReadOnlyMultisig {
